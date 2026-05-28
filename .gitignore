@@ -1,0 +1,18 @@
+# Ignore the virtual environment
+venv/
+ENV/
+env/
+
+# Ignore Python cache files
+__pycache__/
+*.pyc
+
+# Ignore local SQLite development databases
+data/*.db
+data/toolkit_v2.db
+
+# Ignore dynamic runtime uploads and outputs
+data/uploads/*
+data/outputs/*
+!data/uploads/.gitkeep
+!data/outputs/.gitkeep

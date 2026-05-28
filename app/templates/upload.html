@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dynamic Data Engine Cockpit</title>
+    <style>
+        :root {
+            --bg-dark: #0f172a;
+            --card-dark: #1e293b;
+            --accent-blue: #3b82f6;
+            --accent-glow: rgba(59, 130, 246, 0.5);
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --success-green: #10b981;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            background-color: var(--bg-dark);
+            color: var(--text-main);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            overflow: hidden;
+        }
+
+        /* Animated Grid Background Background Effect */
+        body::before {
+            content: "";
+            position: absolute;
+            width: 200%;
+            height: 200%;
+            background-image: linear-gradient(rgba(255,255,255,0.03) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.03) 1px, transparent 1px);
+            background-size: 30px 30px;
+            top: -50%; left: -50%;
+            z-index: 1;
+            transform: perspective(500px) rotateX(60deg);
+            animation: gridMove 20s linear infinite;
+        }
+
+        @keyframes gridMove {
+            0% { transform: perspective(500px) rotateX(60deg) translateY(0); }
+            100% { transform: perspective(500px) rotateX(60deg) translateY(30px); }
+        }
+
+        .cockpit-container {
+            position: relative;
+            z-index: 10;
+            background: rgba(30, 41, 59, 0.7);
+            backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 40px;
+            border-radius: 24px;
+            width: 480px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.4), 0 0 80px rgba(59, 130, 246, 0.15);
+            text-align: center;
+            transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        h1 {
+            font-size: 28px;
+            font-weight: 800;
+            margin: 0 0 8px 0;
+            background: linear-gradient(to right, #60a5fa, #a78bfa);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            letter-spacing: -0.5px;
+        }
+
+        .subtitle {
+            color: var(--text-muted);
+            font-size: 14px;
+            margin-bottom: 35px;
+        }
+
+        /* Innovative Drag and Drop Dropzone */
+        .dropzone-area {
+            border: 2px dashed rgba(255,255,255,0.2);
+            background: rgba(15, 23, 42, 0.5);
+            border-radius: 16px;
+            padding: 40px 20px;
+            cursor: pointer;
+            position: relative;
+            transition: all 0.3s ease;
+        }
+
+        .dropzone-area.dragover {
+            border-color: var(--accent-blue);
+            background: rgba(59, 130, 246, 0.1);
+            box-shadow: inset 0 0 20px rgba(59, 130, 246, 0.2);
+            transform: scale(1.02);
+        }
+
+        .icon-box {
+            font-size: 48px;
+            margin-bottom: 15px;
+            display: inline-block;
+            transition: transform 0.3s ease;
+        }
+
+        .dropzone-area:hover .icon-box {
+            transform: translateY(-5px);
+        }
+
+        .dropzone-text {
+            font-size: 15px;
+            font-weight: 500;
+            color: #cbd5e1;
+            margin-bottom: 5px;
+        }
+
+        .dropzone-subtext {
+            font-size: 12px;
+            color: var(--text-muted);
+        }
+
+        input[type="file"] {
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            opacity: 0;
+            cursor: pointer;
+        }
+
+        /* Futuristic Execution Action Button */
+        .engine-btn {
+            background: linear-gradient(135deg, #2563eb, #1d4ed8);
+            color: white;
+            border: none;
+            padding: 14px 28px;
+            border-radius: 12px;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            width: 100%;
+            margin-top: 25px;
+            box-shadow: 0 4px 15px rgba(29, 78, 216, 0.4);
+            transition: all 0.3s ease;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .engine-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(37, 99, 235, 0.6), 0 0 15px var(--accent-glow);
+        }
+
+        /* Loading Engine Spin Overlay */
+        .loading-spinner {
+            display: none;
+            width: 18px;
+            height: 18px;
+            border: 2px solid rgba(255,255,255,0.3);
+            border-radius: 50%;
+            border-top-color: white;
+            animation: spin 0.8s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(3000deg); }
+        }
+    </style>
+</head>
+<body>
+
+<div class="cockpit-container">
+    <h1>Data Engine v2</h1>
+    <div class="subtitle">Universal Schema Parser & Inconsistency Cleanser</div>
+    
+    <form action="/validate" method="POST" enctype="multipart/form-data" id="uploadForm">
+        <div class="dropzone-area" id="dropzone">
+            <div class="icon-box" id="uiIcon">📊</div>
+            <div class="dropzone-text" id="fileNameDisplay">Drag & Drop Dataset Here</div>
+            <div class="dropzone-subtext" id="fileSizeDisplay">or click to browse local files (.csv)</div>
+            <input type="file" name="file" id="fileInput" accept=".csv" required>
+        </div>
+        
+        <button type="submit" class="engine-btn" id="submitBtn">
+            <div class="loading-spinner" id="spinner"></div>
+            <span id="btnText">Initialize Validation Engine</span>
+        </button>
+    </form>
+</div>
+
+<script>
+    const dropzone = document.getElementById('dropzone');
+    const fileInput = document.getElementById('fileInput');
+    const fileNameDisplay = document.getElementById('fileNameDisplay');
+    const fileSizeDisplay = document.getElementById('fileSizeDisplay');
+    const uiIcon = document.getElementById('uiIcon');
+    const uploadForm = document.getElementById('uploadForm');
+    const submitBtn = document.getElementById('submitBtn');
+    const spinner = document.getElementById('spinner');
+    const btnText = document.getElementById('btnText');
+
+    // Drag over state interactions
+    ['dragenter', 'dragover'].forEach(eventName => {
+        dropzone.addEventListener(eventName, (e) => {
+            e.preventDefault();
+            dropzone.classList.add('dragover');
+        }, false);
+    });
+
+    ['dragleave', 'drop'].forEach(eventName => {
+        dropzone.addEventListener(eventName, (e) => {
+            e.preventDefault();
+            dropzone.classList.remove('dragover');
+        }, false);
+    });
+
+    // Handle dropping files directly onto user workspace layout
+    dropzone.addEventListener('drop', (e) => {
+        const dt = e.dataTransfer;
+        const files = dt.files;
+        if(files.length) {
+            fileInput.files = files;
+            updateInterfaceWithFileData(files[0]);
+        }
+    });
+
+    // Handle normal click selection changes
+    fileInput.addEventListener('change', (e) => {
+        if(fileInput.files.length) {
+            updateInterfaceWithFileData(fileInput.files[0]);
+        }
+    });
+
+    function updateInterfaceWithFileData(file) {
+        if(file.name.endsWith('.csv')) {
+            uiIcon.innerText = "⚡";
+            fileNameDisplay.innerText = file.name;
+            // Convert byte size to readable Megabyte readout string
+            const sizeInMB = (file.size / (1024 * 1024)).toFixed(2);
+            fileSizeDisplay.innerText = `Dataset Payload Size: ${sizeInMB} MB`;
+            fileSizeDisplay.style.color = '#10b981'; // Turn text green on success
+        } else {
+            uiIcon.innerText = "❌";
+            fileNameDisplay.innerText = "Invalid Format Detected";
+            fileSizeDisplay.innerText = "Please drop a clean .csv structural file instead.";
+            fileSizeDisplay.style.color = '#ef4444'; // Red error alert text
+            fileInput.value = "";
+        }
+    }
+
+    // Capture click submission and trigger the dynamic system processing loader
+    uploadForm.addEventListener('submit', () => {
+        submitBtn.style.pointerEvents = "none";
+        submitBtn.style.opacity = "0.8";
+        spinner.style.display = "block";
+        btnText.innerText = "Executing 5-Tier Data Audits...";
+    });
+</script>
+
+</body>
+</html>
